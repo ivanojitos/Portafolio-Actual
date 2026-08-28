@@ -505,6 +505,7 @@ new class extends Component {
                             </a>
                         @endif
                     </div>
+                    <livewire:contact-form />
                 </div>
             </div>
         </section>
