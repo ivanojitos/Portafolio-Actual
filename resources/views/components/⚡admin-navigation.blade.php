@@ -32,6 +32,11 @@ new class extends Component {
 
         <div class="flex items-center gap-5">
 
+            <a href="{{ route('admin.messages.index') }}" wire:navigate
+                class="text-sm text-slate-300 transition hover:text-cyan-300">
+                Mensajes
+            </a>
+
             <a href="{{ route('admin.projects.index') }}" wire:navigate
                 class="text-sm text-slate-300 transition hover:text-cyan-300">
                 Proyectos

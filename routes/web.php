@@ -57,3 +57,13 @@ Route::livewire(
         'admin',
     ])
     ->name('admin.projects.edit');
+
+Route::livewire(
+    '/admin/mensajes',
+    'pages::admin.messages.index'
+)
+    ->middleware([
+        'auth',
+        'admin',
+    ])
+    ->name('admin.messages.index');
