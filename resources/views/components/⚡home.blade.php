@@ -48,6 +48,10 @@ new class extends Component {
                     Inicio
                 </a>
 
+                <a href="#sobre-mi" class="transition hover:text-cyan-300">
+                    Sobre mí
+                </a>
+
                 <a href="#habilidades" class="transition hover:text-cyan-300">
                     Habilidades
                 </a>
@@ -117,6 +121,85 @@ new class extends Component {
                 </div>
             </div>
         </section>
+
+        <section id="sobre-mi" class="border-t border-white/10">
+            <div class="mx-auto grid max-w-7xl gap-12 px-6 py-24 lg:grid-cols-[1fr_1.4fr] lg:px-8">
+                <div>
+                    <p class="font-mono text-sm font-semibold uppercase tracking-[0.25em] text-cyan-300">
+                        Perfil profesional
+                    </p>
+
+                    <h2 class="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                        Sobre mí
+                    </h2>
+
+                    <div class="mt-8 grid grid-cols-2 gap-4">
+                        <div class="rounded-2xl border border-white/10 bg-slate-900/50 p-5">
+                            <strong class="block text-3xl font-black text-cyan-300">
+                                7+
+                            </strong>
+
+                            <span class="mt-2 block text-sm text-slate-400">
+                                Años de experiencia
+                            </span>
+                        </div>
+
+                        <div class="rounded-2xl border border-white/10 bg-slate-900/50 p-5">
+                            <strong class="block text-3xl font-black text-cyan-300">
+                                {{ $this->experiences->count() }}
+                            </strong>
+
+                            <span class="mt-2 block text-sm text-slate-400">
+                                Etapas profesionales
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:pt-10">
+                    @if ($profile->about)
+                        <p class="text-lg leading-9 text-slate-300">
+                            {{ $profile->about }}
+                        </p>
+                    @endif
+
+                    <div class="mt-8 flex flex-wrap gap-3">
+                        <span class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-300">
+                            Arquitectura de software
+                        </span>
+
+                        <span class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-300">
+                            Sistemas escalables
+                        </span>
+
+                        <span class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-300">
+                            Modernización legacy
+                        </span>
+
+                        <span class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-300">
+                            Liderazgo técnico
+                        </span>
+                    </div>
+
+                    <div class="mt-8 flex flex-wrap gap-5 text-sm font-semibold">
+                        @if ($profile->github_url)
+                            <a href="{{ $profile->github_url }}" target="_blank" rel="noopener noreferrer"
+                                class="text-cyan-300 transition hover:text-cyan-200">
+                                Revisar GitHub →
+                            </a>
+                        @endif
+
+                        @if ($profile->linkedin_url)
+                            <a href="{{ $profile->linkedin_url }}" target="_blank" rel="noopener noreferrer"
+                                class="text-slate-300 transition hover:text-white">
+                                Ver LinkedIn ↗
+                            </a>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </section>
+
 
         <section id="habilidades" class="border-t border-white/10 bg-slate-900/30">
             <div class="mx-auto max-w-7xl px-6 py-24 lg:px-8">
