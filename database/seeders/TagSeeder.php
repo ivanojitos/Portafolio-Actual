@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Project;
 use App\Models\Tag;
 use Illuminate\Database\Seeder;
 
@@ -50,22 +49,6 @@ class TagSeeder extends Seeder
             );
         }
 
-        $tagIds = Tag::query()
-            ->orderBy('id')
-            ->pluck('id')
-            ->values();
 
-        Project::query()
-            ->orderBy('id')
-            ->get()
-            ->each(function (Project $project, int $index) use ($tagIds): void {
-                $selectedTags = collect([0, 1, 2])
-                    ->map(
-                        fn (int $offset): int =>
-                            $tagIds[($index + $offset) % $tagIds->count()]
-                    );
-
-                $project->tags()->sync($selectedTags);
-            });
     }
 }
