@@ -430,7 +430,7 @@ new class extends Component {
     <footer class="border-t border-white/10">
         <div class="mx-auto max-w-7xl px-6 py-8 text-sm text-slate-500 lg:px-8">
             &copy; {{ now()->year }} {{ $profile->full_name }}.
-            Desarrollado con Laravel y Livewire.
+            Desarrollado Full Stack Laravel.
         </div>
     </footer>
 </div>
