@@ -3,12 +3,16 @@
 namespace App\Livewire\Forms;
 
 use App\Models\Project;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Form;
+use LogicException;
 
 class ProjectForm extends Form
 {
+    public ?Project $project = null;
+
     public string $title = '';
     public string $slug = '';
     public string $summary = '';
@@ -32,20 +36,21 @@ class ProjectForm extends Form
 
     protected function rules(): array
     {
+        $slugRule = Rule::unique(Project::class, 'slug');
+
+        if ($this->project) {
+            $slugRule->ignore($this->project);
+        }
+
         return [
-            'title' => [
-                'required',
-                'string',
-                'min:3',
-                'max:120',
-            ],
+            'title' => ['required', 'string', 'min:3', 'max:120'],
 
             'slug' => [
                 'nullable',
                 'string',
                 'max:140',
                 'alpha_dash:ascii',
-                Rule::unique(Project::class, 'slug'),
+                $slugRule,
             ],
 
             'summary' => [
@@ -84,13 +89,8 @@ class ProjectForm extends Form
                 'max:500',
             ],
 
-            'isFeatured' => [
-                'boolean',
-            ],
-
-            'isPublished' => [
-                'boolean',
-            ],
+            'isFeatured' => ['boolean'],
+            'isPublished' => ['boolean'],
 
             'position' => [
                 'required',
@@ -146,59 +146,126 @@ class ProjectForm extends Form
         ];
     }
 
+    public function setProject(Project $project): void
+    {
+        $this->project = $project->loadMissing('tags');
+
+        $this->title = $project->title;
+        $this->slug = $project->slug;
+        $this->summary = $project->summary;
+
+        $this->challenge = $project->challenge;
+        $this->solution = $project->solution;
+        $this->results = $project->results ?? '';
+
+        $this->repositoryUrl = $project->repository_url ?? '';
+        $this->demoUrl = $project->demo_url ?? '';
+
+        $this->isFeatured = $project->is_featured;
+        $this->isPublished = $project->is_published;
+        $this->position = $project->position;
+
+        $this->tagIds = $project->tags
+            ->pluck('id')
+            ->map(fn ($id): int => (int) $id)
+            ->all();
+    }
+
     public function store(): Project
     {
         $validated = $this->validate();
 
+        return DB::transaction(function () use ($validated): Project {
+            $project = Project::query()->create(
+                $this->projectData($validated)
+            );
+
+            $project->tags()->sync(
+                $validated['tagIds']
+            );
+
+            $this->reset();
+
+            return $project;
+        });
+    }
+
+    public function update(): Project
+    {
+        if (! $this->project) {
+            throw new LogicException(
+                'No se seleccionó un proyecto para actualizar.'
+            );
+        }
+
+        $validated = $this->validate();
+
+        return DB::transaction(function () use ($validated): Project {
+            $this->project->update(
+                $this->projectData($validated)
+            );
+
+            $this->project->tags()->sync(
+                $validated['tagIds']
+            );
+
+            return $this->project->refresh();
+        });
+    }
+
+    private function projectData(array $validated): array
+    {
         $slug = filled($validated['slug'])
             ? Str::slug($validated['slug'])
             : $this->generateUniqueSlug($validated['title']);
 
-        $project = Project::query()->create([
+        return [
             'title' => trim($validated['title']),
             'slug' => $slug,
             'summary' => trim($validated['summary']),
             'challenge' => trim($validated['challenge']),
             'solution' => trim($validated['solution']),
+
             'results' => filled($validated['results'])
                 ? trim($validated['results'])
                 : null,
+
             'repository_url' => filled($validated['repositoryUrl'])
                 ? trim($validated['repositoryUrl'])
                 : null,
+
             'demo_url' => filled($validated['demoUrl'])
                 ? trim($validated['demoUrl'])
                 : null,
-            'cover_image' => null,
+
             'is_featured' => $validated['isFeatured'],
             'is_published' => $validated['isPublished'],
             'position' => $validated['position'],
+
             'published_at' => $validated['isPublished']
-                ? now()
+                ? ($this->project?->published_at ?? now())
                 : null,
-        ]);
-
-        $project->tags()->sync(
-            $validated['tagIds']
-        );
-
-        $this->reset();
-
-        return $project;
+        ];
     }
 
     private function generateUniqueSlug(string $title): string
     {
-        $baseSlug = Str::slug($title);
+        $baseSlug = Str::slug($title) ?: 'proyecto';
         $slug = $baseSlug;
         $suffix = 2;
 
         while (
             Project::query()
-            ->where('slug', $slug)
-            ->exists()
+                ->when(
+                    $this->project,
+                    fn ($query) => $query->whereKeyNot(
+                        $this->project->getKey()
+                    )
+                )
+                ->where('slug', $slug)
+                ->exists()
         ) {
-            $slug = $baseSlug . '-' . $suffix;
+            $slug = $baseSlug.'-'.$suffix;
             $suffix++;
         }
 

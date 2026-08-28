@@ -47,3 +47,13 @@ Route::livewire(
         'admin',
     ])
     ->name('admin.projects.create');
+
+Route::livewire(
+    '/admin/proyectos/{project:slug}/editar',
+    'pages::admin.projects.create'
+)
+    ->middleware([
+        'auth',
+        'admin',
+    ])
+    ->name('admin.projects.edit');

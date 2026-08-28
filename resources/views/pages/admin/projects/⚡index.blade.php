@@ -147,7 +147,15 @@ new #[Layout('layouts::app')] #[Title('Administrar proyectos')] class extends Co
                                     </td>
 
                                     <td class="px-6 py-5 text-right">
+
                                         @if ($project->isPubliclyVisible())
+                                            <a href="{{ route('admin.projects.edit', [
+                                                'project' => $project->slug,
+                                            ]) }}"
+                                                wire:navigate
+                                                class="mr-4 text-sm font-semibold text-slate-300 hover:text-white">
+                                                Editar
+                                            </a>
                                             <a href="{{ route('projects.show', ['project' => $project->slug]) }}"
                                                 target="_blank" rel="noopener noreferrer"
                                                 class="text-sm font-semibold text-cyan-300 hover:text-cyan-200">
