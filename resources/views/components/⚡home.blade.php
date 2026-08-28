@@ -76,48 +76,75 @@ new class extends Component {
             <div class="absolute left-1/2 top-10 -z-10 h-80 w-80 -translate-x-1/2 rounded-full bg-cyan-400/20 blur-3xl"
                 aria-hidden="true"></div>
 
-            <div class="mx-auto max-w-7xl px-6 py-24 lg:px-8 lg:py-32">
-                <div class="max-w-4xl">
-                    <div class="flex flex-wrap items-center gap-3">
-                        <p class="font-mono text-sm font-semibold uppercase tracking-[0.25em] text-cyan-300">
-                            {{ $profile->headline }}
-                        </p>
+            <div class="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-28">
+                <div class="grid items-center gap-14 lg:grid-cols-[1.35fr_0.65fr]">
+                    <div>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <p class="font-mono text-sm font-semibold uppercase tracking-[0.25em] text-cyan-300">
+                                {{ $profile->headline }}
+                            </p>
 
-                        @if ($profile->is_available)
-                            <span
-                                class="rounded-full bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-300">
-                                Disponible
+                            @if ($profile->is_available)
+                                <span
+                                    class="rounded-full bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-300">
+                                    Disponible
+                                </span>
+                            @endif
+                        </div>
+
+                        <h1 class="mt-6 text-5xl font-black tracking-tight text-white sm:text-6xl lg:text-7xl">
+                            Ivan Alvarez
+                            <span class="block text-cyan-300">
+                                Valencia
                             </span>
-                        @endif
-                    </div>
+                        </h1>
 
-                    <p class="mt-8 max-w-3xl text-lg leading-8 text-slate-300">
-                        {{ $profile->introduction }}
-                    </p>
-
-                    @if ($profile->location)
-                        <p class="mt-4 text-sm text-slate-500">
-                            {{ $profile->location }}
+                        <p class="mt-8 max-w-3xl text-lg leading-8 text-slate-300">
+                            {{ $profile->introduction }}
                         </p>
-                    @endif
 
-                    <p class="mt-8 max-w-2xl text-lg leading-8 text-slate-300">
-                        Desarrollo aplicaciones web con Laravel, PHP y
-                        tecnologías modernas. Transformo problemas complejos
-                        en productos claros, rápidos y confiables.
-                    </p>
+                        @if ($profile->location)
+                            <p class="mt-4 flex items-center gap-2 text-sm text-slate-500">
+                                <span class="h-2 w-2 rounded-full bg-cyan-300" aria-hidden="true"></span>
 
-                    <div class="mt-10 flex flex-wrap gap-4">
-                        <a href="#proyectos"
-                            class="rounded-xl bg-cyan-300 px-6 py-3 font-semibold text-slate-950 transition hover:bg-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-300">
-                            Ver proyectos
-                        </a>
+                                {{ $profile->location }}
+                            </p>
+                        @endif
 
-                        <a href="#contacto"
-                            class="rounded-xl border border-white/20 px-6 py-3 font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-300">
-                            Contactarme
-                        </a>
+                        <div class="mt-10 flex flex-wrap gap-4">
+                            <a href="#proyectos"
+                                class="rounded-xl bg-cyan-300 px-6 py-3 font-semibold text-slate-950 transition hover:bg-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-300">
+                                Ver proyectos
+                            </a>
+
+                            <a href="#contacto"
+                                class="rounded-xl border border-white/20 px-6 py-3 font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-300">
+                                Contactarme
+                            </a>
+                        </div>
                     </div>
+
+                    @if ($profile->avatarMedia)
+                        <div class="relative mx-auto w-full max-w-sm lg:mx-0 lg:ml-auto">
+                            <div class="absolute -inset-4 -z-10 rounded-[2rem] bg-gradient-to-br from-cyan-300/20 to-indigo-500/20 blur-2xl"
+                                aria-hidden="true"></div>
+
+                            <img src="{{ $profile->avatarMedia->url() }}" alt="{{ $profile->avatarMedia->alt_text }}"
+                                width="332" height="443"
+                                class="aspect-[3/4] w-full rounded-[2rem] border border-cyan-300/20 object-cover object-top shadow-2xl shadow-black/40">
+
+                            <div
+                                class="absolute -bottom-5 -left-5 rounded-2xl border border-white/10 bg-slate-900/90 px-5 py-4 shadow-xl backdrop-blur">
+                                <p class="font-mono text-xs uppercase tracking-widest text-slate-500">
+                                    Experiencia
+                                </p>
+
+                                <p class="mt-1 text-lg font-bold text-white">
+                                    7+ años
+                                </p>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </section>

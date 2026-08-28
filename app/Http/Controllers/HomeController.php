@@ -11,6 +11,9 @@ class HomeController extends Controller
     {
         return view('home', [
             'profile' => Profile::query()
+                ->with([
+                    'avatarMedia:id,mediable_type,mediable_id,disk,path,alt_text',
+                ])
                 ->published()
                 ->firstOrFail(),
         ]);
