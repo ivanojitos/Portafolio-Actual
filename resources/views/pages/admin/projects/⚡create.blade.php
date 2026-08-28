@@ -8,10 +8,17 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use App\Actions\Projects\StoreProjectCoverImage;
+use Livewire\WithFileUploads;
 
 new #[Layout('layouts::app')] #[Title('Nuevo proyecto')] class extends Component {
+    use WithFileUploads;
     public ProjectForm $form;
     public ?Project $project = null;
+
+    public $coverImage = null;
+
+    public string $coverAlt = '';
 
     public function mount(?Project $project = null): void
     {
@@ -20,6 +27,10 @@ new #[Layout('layouts::app')] #[Title('Nuevo proyecto')] class extends Component
         if ($project) {
             Gate::authorize('update', $project);
             $this->form->setProject($project);
+
+            $project->loadMissing('primaryMedia');
+
+            $this->coverAlt = $project->primaryMedia?->alt_text ?? '';
 
             return;
         }
@@ -35,6 +46,21 @@ new #[Layout('layouts::app')] #[Title('Nuevo proyecto')] class extends Component
 
     public function save(): void
     {
+        $this->validate(
+            [
+                'coverImage' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+
+                'coverAlt' => [$this->coverImage ? 'required' : 'nullable', 'string', 'max:180'],
+            ],
+            [
+                'coverImage.image' => 'Selecciona una imagen válida.',
+                'coverImage.mimes' => 'La imagen debe ser JPG, PNG o WebP.',
+                'coverImage.max' => 'La imagen no puede superar 2 MB.',
+                'coverAlt.required' => 'Describe la imagen para lectores de pantalla.',
+                'coverAlt.max' => 'La descripción no puede superar 180 caracteres.',
+            ],
+        );
+
         if ($this->project) {
             Gate::authorize('update', $this->project);
 
@@ -45,6 +71,10 @@ new #[Layout('layouts::app')] #[Title('Nuevo proyecto')] class extends Component
 
             $project = $this->form->store();
             $message = "El proyecto {$project->title} fue creado correctamente.";
+        }
+
+        if ($this->coverImage) {
+            app(StoreProjectCoverImage::class)->execute($project, $this->coverImage, $this->coverAlt);
         }
 
         session()->flash('success', $message);
@@ -233,6 +263,66 @@ new #[Layout('layouts::app')] #[Title('Nuevo proyecto')] class extends Component
                         <p class="mt-2 text-sm text-red-300">{{ $message }}</p>
                     @enderror
                 </fieldset>
+
+                <div class="mt-8 border-t border-white/10 pt-8">
+                    <h3 class="font-semibold text-white">
+                        Imagen de portada
+                    </h3>
+
+                    @if ($project?->primaryMedia && !$coverImage)
+                        <div class="mt-4">
+                            <img src="{{ $project->primaryMedia->url() }}"
+                                alt="{{ $project->primaryMedia->alt_text }}"
+                                class="aspect-video w-full max-w-xl rounded-xl object-cover">
+                        </div>
+                    @endif
+
+                    @if ($coverImage)
+                        <div class="mt-4">
+                            <img src="{{ $coverImage->temporaryUrl() }}" alt="Vista previa de la nueva imagen"
+                                class="aspect-video w-full max-w-xl rounded-xl object-cover">
+                        </div>
+                    @endif
+
+                    <div class="mt-6 grid gap-6">
+                        <div>
+                            <label for="cover-image" class="text-sm font-medium text-slate-200">
+                                Archivo
+                            </label>
+
+                            <input id="cover-image" type="file" wire:model="coverImage"
+                                accept="image/jpeg,image/png,image/webp"
+                                class="mt-2 block w-full text-sm text-slate-400 file:mr-4 file:rounded-lg file:border-0 file:bg-cyan-300 file:px-4 file:py-2 file:font-semibold file:text-slate-950">
+
+                            <p class="mt-2 text-xs text-slate-500">
+                                JPG, PNG o WebP. Máximo 2 MB.
+                            </p>
+
+                            <p wire:loading wire:target="coverImage" class="mt-2 text-sm text-cyan-300">
+                                Procesando imagen...
+                            </p>
+
+                            @error('coverImage')
+                                <p class="mt-2 text-sm text-red-300">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label for="cover-alt" class="text-sm font-medium text-slate-200">
+                                Descripción accesible
+                            </label>
+
+                            <input id="cover-alt" type="text" wire:model.blur="coverAlt" maxlength="180"
+                                placeholder="Describe brevemente lo que aparece en la imagen"
+                                class="mt-2 w-full rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none placeholder:text-slate-600 focus:border-cyan-300">
+
+                            @error('coverAlt')
+                                <p class="mt-2 text-sm text-red-300">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
             </section>
 
             <section class="rounded-2xl border border-white/10 bg-slate-900/60 p-6 sm:p-8">
