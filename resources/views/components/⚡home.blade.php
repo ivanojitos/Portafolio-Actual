@@ -4,6 +4,7 @@ use App\Models\Project;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use App\Models\Experience;
+use App\Models\Skill;
 
 new class extends Component {
     #[Computed]
@@ -23,6 +24,11 @@ new class extends Component {
     {
         return Experience::query()->published()->ordered()->get();
     }
+    #[Computed]
+    public function skillsByCategory()
+    {
+        return Skill::query()->published()->ordered()->get()->groupBy(fn(Skill $skill): string => $skill->category->value);
+    }
 };
 
 ?>
@@ -38,6 +44,10 @@ new class extends Component {
             <div class="hidden items-center gap-8 text-sm text-slate-300 md:flex">
                 <a href="#inicio" class="transition hover:text-cyan-300">
                     Inicio
+                </a>
+
+                <a href="#habilidades" class="transition hover:text-cyan-300">
+                    Habilidades
                 </a>
 
                 <a href="#experiencia" class="transition hover:text-cyan-300">
@@ -92,6 +102,80 @@ new class extends Component {
                 </div>
             </div>
         </section>
+
+        <section id="habilidades" class="border-t border-white/10 bg-slate-900/30">
+            <div class="mx-auto max-w-7xl px-6 py-24 lg:px-8">
+                <div class="max-w-2xl">
+                    <p class="font-mono text-sm font-semibold uppercase tracking-[0.25em] text-cyan-300">
+                        Stack tecnológico
+                    </p>
+
+                    <h2 class="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                        Habilidades técnicas
+                    </h2>
+
+                    <p class="mt-5 text-lg leading-8 text-slate-300">
+                        Tecnologías utilizadas para construir aplicaciones seguras,
+                        mantenibles y preparadas para producción.
+                    </p>
+                </div>
+
+                @if ($this->skillsByCategory->isEmpty())
+                    <div class="mt-12 rounded-2xl border border-dashed border-white/20 p-10 text-center">
+                        <p class="text-slate-300">
+                            Las habilidades se publicarán próximamente.
+                        </p>
+                    </div>
+                @else
+                    <div class="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                        @foreach ($this->skillsByCategory as $categorySkills)
+                            @php
+                                $category = $categorySkills->first()->category;
+                            @endphp
+
+                            <section class="rounded-2xl border border-white/10 bg-slate-950/70 p-6">
+                                <h3 class="text-lg font-bold text-white">
+                                    {{ $category->label() }}
+                                </h3>
+
+                                <div class="mt-6 space-y-5">
+                                    @foreach ($categorySkills as $skill)
+                                        <article wire:key="skill-{{ $skill->id }}"
+                                            class="border-t border-white/10 pt-5 first:border-0 first:pt-0">
+                                            <div class="flex items-start justify-between gap-4">
+                                                <h4 class="font-semibold text-cyan-200">
+                                                    {{ $skill->name }}
+                                                </h4>
+
+                                                <span
+                                                    class="rounded-full bg-white/5 px-2.5 py-1 text-[0.7rem] text-slate-400">
+                                                    {{ $skill->level->label() }}
+                                                </span>
+                                            </div>
+
+                                            @if ($skill->summary)
+                                                <p class="mt-2 text-sm leading-6 text-slate-400">
+                                                    {{ $skill->summary }}
+                                                </p>
+                                            @endif
+
+                                            @if ($skill->years_experience)
+                                                <p class="mt-2 text-xs text-slate-500">
+                                                    {{ $skill->years_experience }}
+                                                    {{ $skill->years_experience === 1 ? 'año' : 'años' }}
+                                                    de experiencia
+                                                </p>
+                                            @endif
+                                        </article>
+                                    @endforeach
+                                </div>
+                            </section>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+        </section>
+
 
         <section id="experiencia" class="border-t border-white/10">
             <div class="mx-auto max-w-7xl px-6 py-24 lg:px-8">
