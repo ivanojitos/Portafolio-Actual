@@ -5,8 +5,10 @@ use Livewire\Attributes\Computed;
 use Livewire\Component;
 use App\Models\Experience;
 use App\Models\Skill;
+use App\Models\Profile;
 
 new class extends Component {
+    public Profile $profile;
     #[Computed]
     public function projects()
     {
@@ -38,7 +40,7 @@ new class extends Component {
         <nav class="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-8"
             aria-label="Navegación principal">
             <a href="#inicio" class="text-lg font-bold tracking-tight text-white">
-                Mi Portafolio
+                {{ $profile->full_name }}
             </a>
 
             <div class="hidden items-center gap-8 text-sm text-slate-300 md:flex">
@@ -72,15 +74,28 @@ new class extends Component {
 
             <div class="mx-auto max-w-7xl px-6 py-24 lg:px-8 lg:py-32">
                 <div class="max-w-4xl">
-                    <p class="font-mono text-sm font-semibold uppercase tracking-[0.25em] text-cyan-300">
-                        Desarrollador de software
+                    <div class="flex flex-wrap items-center gap-3">
+                        <p class="font-mono text-sm font-semibold uppercase tracking-[0.25em] text-cyan-300">
+                            {{ $profile->headline }}
+                        </p>
+
+                        @if ($profile->is_available)
+                            <span
+                                class="rounded-full bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-300">
+                                Disponible
+                            </span>
+                        @endif
+                    </div>
+
+                    <p class="mt-8 max-w-3xl text-lg leading-8 text-slate-300">
+                        {{ $profile->introduction }}
                     </p>
 
-                    <h1 class="mt-6 text-4xl font-black tracking-tight text-white sm:text-6xl lg:text-7xl">
-                        Construyo software seguro,
-                        <span class="text-cyan-300">mantenible</span>
-                        y preparado para crecer.
-                    </h1>
+                    @if ($profile->location)
+                        <p class="mt-4 text-sm text-slate-500">
+                            {{ $profile->location }}
+                        </p>
+                    @endif
 
                     <p class="mt-8 max-w-2xl text-lg leading-8 text-slate-300">
                         Desarrollo aplicaciones web con Laravel, PHP y
@@ -384,10 +399,29 @@ new class extends Component {
                         APIs y sistemas empresariales.
                     </p>
 
-                    <a href="ivanalvarez2507@gmail.com"
-                        class="mt-8 inline-flex rounded-xl bg-cyan-300 px-6 py-3 font-semibold text-slate-950 transition hover:bg-cyan-200">
-                        Enviar correo
-                    </a>
+                    <div class="mt-8 flex flex-wrap justify-center gap-4">
+
+                        @if ($profile->public_email)
+                            <a href="mailto:{{ $profile->public_email }}"
+                                class="inline-flex rounded-xl bg-cyan-300 px-6 py-3 font-semibold text-slate-950 transition hover:bg-cyan-200">
+                                Enviar correo
+                            </a>
+                        @endif
+
+                        @if ($profile->github_url)
+                            <a href="{{ $profile->github_url }}" target="_blank" rel="noopener noreferrer"
+                                class="inline-flex rounded-xl border border-white/20 px-6 py-3 font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-300">
+                                GitHub
+                            </a>
+                        @endif
+
+                        @if ($profile->linkedin_url)
+                            <a href="{{ $profile->linkedin_url }}" target="_blank" rel="noopener noreferrer"
+                                class="inline-flex rounded-xl border border-white/20 px-6 py-3 font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-300">
+                                LinkedIn
+                            </a>
+                        @endif
+                    </div>
                 </div>
             </div>
         </section>
@@ -395,7 +429,7 @@ new class extends Component {
 
     <footer class="border-t border-white/10">
         <div class="mx-auto max-w-7xl px-6 py-8 text-sm text-slate-500 lg:px-8">
-            &copy; {{ now()->year }} Mi Portafolio.
+            &copy; {{ now()->year }} {{ $profile->full_name }}.
             Desarrollado con Laravel y Livewire.
         </div>
     </footer>

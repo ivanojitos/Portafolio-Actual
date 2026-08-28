@@ -10,17 +10,19 @@
 
     <meta
         name="description"
-        content="Portafolio profesional de un desarrollador de software especializado en Laravel."
+        content="{{ $profile->meta_description }}"
     >
 
-    <title>Mi Portafolio | Desarrollador de Software</title>
+    <meta name="author" content="{{ $profile->full_name }}">
+
+    <title>{{ $profile->meta_title }}</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
 
 <body class="min-h-screen bg-slate-950 text-slate-100 antialiased">
-    <livewire:home />
+    <livewire:home :$profile />
 
     @livewireScripts
 </body>
