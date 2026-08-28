@@ -4,12 +4,12 @@ use App\Models\Project;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-new class extends Component
-{
+new class extends Component {
     #[Computed]
     public function projects()
     {
         return Project::query()
+            ->with(['tags:id,name,slug,color'])
             ->published()
             ->featured()
             ->ordered()
@@ -22,36 +22,22 @@ new class extends Component
 
 <div>
     <header class="border-b border-white/10">
-        <nav
-            class="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-8"
-            aria-label="Navegación principal"
-        >
-            <a
-                href="#inicio"
-                class="text-lg font-bold tracking-tight text-white"
-            >
+        <nav class="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-8"
+            aria-label="Navegación principal">
+            <a href="#inicio" class="text-lg font-bold tracking-tight text-white">
                 Mi Portafolio
             </a>
 
             <div class="hidden items-center gap-8 text-sm text-slate-300 md:flex">
-                <a
-                    href="#inicio"
-                    class="transition hover:text-cyan-300"
-                >
+                <a href="#inicio" class="transition hover:text-cyan-300">
                     Inicio
                 </a>
 
-                <a
-                    href="#proyectos"
-                    class="transition hover:text-cyan-300"
-                >
+                <a href="#proyectos" class="transition hover:text-cyan-300">
                     Proyectos
                 </a>
 
-                <a
-                    href="#contacto"
-                    class="transition hover:text-cyan-300"
-                >
+                <a href="#contacto" class="transition hover:text-cyan-300">
                     Contacto
                 </a>
             </div>
@@ -59,14 +45,9 @@ new class extends Component
     </header>
 
     <main>
-        <section
-            id="inicio"
-            class="relative isolate overflow-hidden"
-        >
-            <div
-                class="absolute left-1/2 top-10 -z-10 h-80 w-80 -translate-x-1/2 rounded-full bg-cyan-400/20 blur-3xl"
-                aria-hidden="true"
-            ></div>
+        <section id="inicio" class="relative isolate overflow-hidden">
+            <div class="absolute left-1/2 top-10 -z-10 h-80 w-80 -translate-x-1/2 rounded-full bg-cyan-400/20 blur-3xl"
+                aria-hidden="true"></div>
 
             <div class="mx-auto max-w-7xl px-6 py-24 lg:px-8 lg:py-32">
                 <div class="max-w-4xl">
@@ -87,17 +68,13 @@ new class extends Component
                     </p>
 
                     <div class="mt-10 flex flex-wrap gap-4">
-                        <a
-                            href="#proyectos"
-                            class="rounded-xl bg-cyan-300 px-6 py-3 font-semibold text-slate-950 transition hover:bg-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-300"
-                        >
+                        <a href="#proyectos"
+                            class="rounded-xl bg-cyan-300 px-6 py-3 font-semibold text-slate-950 transition hover:bg-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-300">
                             Ver proyectos
                         </a>
 
-                        <a
-                            href="#contacto"
-                            class="rounded-xl border border-white/20 px-6 py-3 font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-300"
-                        >
+                        <a href="#contacto"
+                            class="rounded-xl border border-white/20 px-6 py-3 font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-300">
                             Contactarme
                         </a>
                     </div>
@@ -105,10 +82,7 @@ new class extends Component
             </div>
         </section>
 
-        <section
-            id="proyectos"
-            class="border-y border-white/10 bg-slate-900/40"
-        >
+        <section id="proyectos" class="border-y border-white/10 bg-slate-900/40">
             <div class="mx-auto max-w-7xl px-6 py-24 lg:px-8">
                 <div class="max-w-2xl">
                     <p class="font-mono text-sm font-semibold uppercase tracking-[0.25em] text-cyan-300">
@@ -134,12 +108,11 @@ new class extends Component
                 @else
                     <div class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                         @foreach ($this->projects as $project)
-                            <article
-                                wire:key="project-{{ $project->id }}"
-                                class="group flex flex-col rounded-2xl border border-white/10 bg-slate-950/70 p-6 shadow-xl shadow-black/10 transition duration-300 hover:-translate-y-1 hover:border-cyan-300/50"
-                            >
+                            <article wire:key="project-{{ $project->id }}"
+                                class="group flex flex-col rounded-2xl border border-white/10 bg-slate-950/70 p-6 shadow-xl shadow-black/10 transition duration-300 hover:-translate-y-1 hover:border-cyan-300/50">
                                 <div class="flex items-center justify-between gap-4">
-                                    <span class="rounded-full bg-cyan-300/10 px-3 py-1 text-xs font-semibold text-cyan-300">
+                                    <span
+                                        class="rounded-full bg-cyan-300/10 px-3 py-1 text-xs font-semibold text-cyan-300">
                                         Destacado
                                     </span>
 
@@ -152,29 +125,33 @@ new class extends Component
                                     {{ $project->title }}
                                 </h3>
 
-                                <p class="mt-4 flex-1 leading-7 text-slate-400">
+                                <p class="mt-4 leading-7 text-slate-400">
                                     {{ $project->summary }}
                                 </p>
 
-                                <div class="mt-8 flex flex-wrap gap-5 text-sm font-semibold">
+                                @if ($project->tags->isNotEmpty())
+                                    <ul class="mt-6 flex flex-wrap gap-2" aria-label="Tecnologías utilizadas">
+                                        @foreach ($project->tags as $tag)
+                                            <li wire:key="project-{{ $project->id }}-tag-{{ $tag->id }}"
+                                                class="rounded-full border border-cyan-300/20 bg-cyan-300/5 px-3 py-1 text-xs font-medium text-cyan-200">
+                                                {{ $tag->name }}
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @endif
+
+                                <div class="mt-8 flex flex-1 flex-wrap items-end gap-5 text-sm font-semibold">
                                     @if ($project->repository_url)
-                                        <a
-                                            href="{{ $project->repository_url }}"
-                                            target="_blank"
+                                        <a href="{{ $project->repository_url }}" target="_blank"
                                             rel="noopener noreferrer"
-                                            class="text-cyan-300 transition hover:text-cyan-200"
-                                        >
+                                            class="text-cyan-300 transition hover:text-cyan-200">
                                             Ver código →
                                         </a>
                                     @endif
 
                                     @if ($project->demo_url)
-                                        <a
-                                            href="{{ $project->demo_url }}"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            class="text-slate-300 transition hover:text-white"
-                                        >
+                                        <a href="{{ $project->demo_url }}" target="_blank" rel="noopener noreferrer"
+                                            class="text-slate-300 transition hover:text-white">
                                             Demostración ↗
                                         </a>
                                     @endif
@@ -202,10 +179,8 @@ new class extends Component
                         APIs y sistemas empresariales.
                     </p>
 
-                    <a
-                        href="ivanalvarez2507@gmail.com"
-                        class="mt-8 inline-flex rounded-xl bg-cyan-300 px-6 py-3 font-semibold text-slate-950 transition hover:bg-cyan-200"
-                    >
+                    <a href="ivanalvarez2507@gmail.com"
+                        class="mt-8 inline-flex rounded-xl bg-cyan-300 px-6 py-3 font-semibold text-slate-950 transition hover:bg-cyan-200">
                         Enviar correo
                     </a>
                 </div>
