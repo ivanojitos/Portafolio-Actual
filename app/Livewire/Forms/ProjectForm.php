@@ -152,7 +152,7 @@ class ProjectForm extends Form
 
         $slug = filled($validated['slug'])
             ? Str::slug($validated['slug'])
-            : Str::slug($validated['title']);
+            : $this->generateUniqueSlug($validated['title']);
 
         $project = Project::query()->create([
             'title' => trim($validated['title']),
@@ -185,5 +185,23 @@ class ProjectForm extends Form
         $this->reset();
 
         return $project;
+    }
+
+    private function generateUniqueSlug(string $title): string
+    {
+        $baseSlug = Str::slug($title);
+        $slug = $baseSlug;
+        $suffix = 2;
+
+        while (
+            Project::query()
+            ->where('slug', $slug)
+            ->exists()
+        ) {
+            $slug = $baseSlug . '-' . $suffix;
+            $suffix++;
+        }
+
+        return $slug;
     }
 }

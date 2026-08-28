@@ -37,3 +37,13 @@ Route::livewire(
         'admin',
     ])
     ->name('admin.projects.index');
+
+Route::livewire(
+    '/admin/proyectos/nuevo',
+    'pages::admin.projects.create'
+)
+    ->middleware([
+        'auth',
+        'admin',
+    ])
+    ->name('admin.projects.create');

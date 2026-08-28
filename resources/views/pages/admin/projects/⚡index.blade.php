@@ -9,11 +9,7 @@ use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-new
-#[Layout('layouts::app')]
-#[Title('Administrar proyectos')]
-class extends Component
-{
+new #[Layout('layouts::app')] #[Title('Administrar proyectos')] class extends Component {
     use WithPagination;
 
     #[Url(as: 'buscar', except: '')]
@@ -33,26 +29,12 @@ class extends Component
     public function projects()
     {
         return Project::query()
-            ->with([
-                'tags:id,name,slug',
-            ])
+            ->with(['tags:id,name,slug'])
             ->when(
                 filled($this->search),
-                fn ($query) => $query->where(
-                    function ($query): void {
-                        $query
-                            ->where(
-                                'title',
-                                'like',
-                                '%'.$this->search.'%'
-                            )
-                            ->orWhere(
-                                'summary',
-                                'like',
-                                '%'.$this->search.'%'
-                            );
-                    }
-                )
+                fn($query) => $query->where(function ($query): void {
+                    $query->where('title', 'like', '%' . $this->search . '%')->orWhere('summary', 'like', '%' . $this->search . '%');
+                }),
             )
             ->orderBy('position')
             ->orderByDesc('created_at')
@@ -81,14 +63,10 @@ class extends Component
                 </p>
             </div>
 
-            <button
-                type="button"
-                disabled
-                class="cursor-not-allowed rounded-xl bg-cyan-300 px-5 py-3 font-semibold text-slate-950 opacity-50"
-                title="Disponible en el siguiente paso"
-            >
+            <a href="{{ route('admin.projects.create') }}" wire:navigate
+                class="rounded-xl bg-cyan-300 px-5 py-3 font-semibold text-slate-950 transition hover:bg-cyan-200">
                 Nuevo proyecto
-            </button>
+            </a>
         </div>
 
         <div class="mt-10">
@@ -96,13 +74,9 @@ class extends Component
                 Buscar proyectos
             </label>
 
-            <input
-                id="project-search"
-                type="search"
-                wire:model.live.debounce.300ms="search"
+            <input id="project-search" type="search" wire:model.live.debounce.300ms="search"
                 placeholder="Buscar por título o descripción..."
-                class="w-full max-w-xl rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white outline-none placeholder:text-slate-600 focus:border-cyan-300"
-            >
+                class="w-full max-w-xl rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white outline-none placeholder:text-slate-600 focus:border-cyan-300">
         </div>
 
         <div class="mt-8 overflow-hidden rounded-2xl border border-white/10">
@@ -112,6 +86,13 @@ class extends Component
                 </div>
             @else
                 <div class="overflow-x-auto">
+
+                    @if (session('success'))
+                        <div class="mt-8 rounded-xl border border-emerald-400/20 bg-emerald-400/10 p-4 text-sm text-emerald-200"
+                            role="status">
+                            {{ session('success') }}
+                        </div>
+                    @endif
                     <table class="min-w-full divide-y divide-white/10">
                         <thead class="bg-slate-900/80">
                             <tr class="text-left text-xs uppercase tracking-wider text-slate-400">
@@ -139,7 +120,8 @@ class extends Component
                                     <td class="px-6 py-5">
                                         <div class="flex max-w-xs flex-wrap gap-2">
                                             @foreach ($project->tags as $tag)
-                                                <span class="rounded-full bg-white/5 px-2.5 py-1 text-xs text-slate-300">
+                                                <span
+                                                    class="rounded-full bg-white/5 px-2.5 py-1 text-xs text-slate-300">
                                                     {{ $tag->name }}
                                                 </span>
                                             @endforeach
@@ -148,11 +130,13 @@ class extends Component
 
                                     <td class="px-6 py-5">
                                         @if ($project->is_published)
-                                            <span class="rounded-full bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-300">
+                                            <span
+                                                class="rounded-full bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-300">
                                                 Publicado
                                             </span>
                                         @else
-                                            <span class="rounded-full bg-amber-400/10 px-3 py-1 text-xs font-semibold text-amber-300">
+                                            <span
+                                                class="rounded-full bg-amber-400/10 px-3 py-1 text-xs font-semibold text-amber-300">
                                                 Borrador
                                             </span>
                                         @endif
@@ -164,12 +148,9 @@ class extends Component
 
                                     <td class="px-6 py-5 text-right">
                                         @if ($project->isPubliclyVisible())
-                                            <a
-                                                href="{{ route('projects.show', ['project' => $project->slug]) }}"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                class="text-sm font-semibold text-cyan-300 hover:text-cyan-200"
-                                            >
+                                            <a href="{{ route('projects.show', ['project' => $project->slug]) }}"
+                                                target="_blank" rel="noopener noreferrer"
+                                                class="text-sm font-semibold text-cyan-300 hover:text-cyan-200">
                                                 Ver ↗
                                             </a>
                                         @else
