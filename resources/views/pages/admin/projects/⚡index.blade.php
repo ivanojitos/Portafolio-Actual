@@ -15,6 +15,9 @@ new #[Layout('layouts::app')] #[Title('Administrar proyectos')] class extends Co
     #[Url(as: 'buscar', except: '')]
     public string $search = '';
 
+    #[Url(as: 'papelera', except: false)]
+    public bool $showTrashed = false;
+
     public function mount(): void
     {
         Gate::authorize('viewAny', Project::class);
@@ -25,10 +28,37 @@ new #[Layout('layouts::app')] #[Title('Administrar proyectos')] class extends Co
         $this->resetPage();
     }
 
+    public function delete(int $projectId): void
+    {
+        $project = Project::query()->findOrFail($projectId);
+
+        Gate::authorize('delete', $project);
+
+        $project->delete();
+
+        unset($this->projects);
+
+        session()->flash('success', "El proyecto {$project->title} fue enviado a la papelera.");
+    }
+
+    public function restore(int $projectId): void
+    {
+        $project = Project::query()->onlyTrashed()->findOrFail($projectId);
+
+        Gate::authorize('restore', $project);
+
+        $project->restore();
+
+        unset($this->projects);
+
+        session()->flash('success', "El proyecto {$project->title} fue restaurado.");
+    }
+
     #[Computed]
     public function projects()
     {
         return Project::query()
+            ->when($this->showTrashed, fn($query) => $query->onlyTrashed())
             ->with(['tags:id,name,slug'])
             ->when(
                 filled($this->search),
@@ -39,6 +69,13 @@ new #[Layout('layouts::app')] #[Title('Administrar proyectos')] class extends Co
             ->orderBy('position')
             ->orderByDesc('created_at')
             ->paginate(10);
+    }
+
+    public function updatedShowTrashed(): void
+    {
+        $this->resetPage();
+
+        unset($this->projects);
     }
 };
 
@@ -69,14 +106,23 @@ new #[Layout('layouts::app')] #[Title('Administrar proyectos')] class extends Co
             </a>
         </div>
 
-        <div class="mt-10">
-            <label for="project-search" class="sr-only">
-                Buscar proyectos
-            </label>
+        <div class="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div class="w-full max-w-xl">
+                <label for="project-search" class="sr-only">
+                    Buscar proyectos
+                </label>
 
-            <input id="project-search" type="search" wire:model.live.debounce.300ms="search"
-                placeholder="Buscar por título o descripción..."
-                class="w-full max-w-xl rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white outline-none placeholder:text-slate-600 focus:border-cyan-300">
+                <input id="project-search" type="search" wire:model.live.debounce.300ms="search"
+                    placeholder="Buscar por título o descripción..."
+                    class="w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white outline-none placeholder:text-slate-600 focus:border-cyan-300">
+            </div>
+
+            <label class="flex items-center gap-3 text-sm text-slate-300">
+                <input type="checkbox" wire:model.live="showTrashed"
+                    class="rounded border-white/20 bg-slate-900 text-cyan-300 focus:ring-cyan-300">
+
+                Mostrar papelera
+            </label>
         </div>
 
         <div class="mt-8 overflow-hidden rounded-2xl border border-white/10">
@@ -146,27 +192,36 @@ new #[Layout('layouts::app')] #[Title('Administrar proyectos')] class extends Co
                                         {{ $project->position }}
                                     </td>
 
-                                    <td class="px-6 py-5 text-right">
+                                    @if ($showTrashed)
+                                        <button type="button" wire:click="restore({{ $project->id }})"
+                                            class="text-sm font-semibold text-emerald-300 transition hover:text-emerald-200">
+                                            Restaurar
+                                        </button>
+                                    @else
+                                        <a href="{{ route('admin.projects.edit', [
+                                            'project' => $project->slug,
+                                        ]) }}"
+                                            wire:navigate
+                                            class="mr-4 text-sm font-semibold text-slate-300 transition hover:text-white">
+                                            Editar
+                                        </a>
 
                                         @if ($project->isPubliclyVisible())
-                                            <a href="{{ route('admin.projects.edit', [
+                                            <a href="{{ route('projects.show', [
                                                 'project' => $project->slug,
                                             ]) }}"
-                                                wire:navigate
-                                                class="mr-4 text-sm font-semibold text-slate-300 hover:text-white">
-                                                Editar
-                                            </a>
-                                            <a href="{{ route('projects.show', ['project' => $project->slug]) }}"
                                                 target="_blank" rel="noopener noreferrer"
-                                                class="text-sm font-semibold text-cyan-300 hover:text-cyan-200">
+                                                class="mr-4 text-sm font-semibold text-cyan-300 transition hover:text-cyan-200">
                                                 Ver ↗
                                             </a>
-                                        @else
-                                            <span class="text-sm text-slate-600">
-                                                No visible
-                                            </span>
                                         @endif
-                                    </td>
+
+                                        <button type="button" wire:click="delete({{ $project->id }})"
+                                            wire:confirm="¿Enviar este proyecto a la papelera?"
+                                            class="text-sm font-semibold text-red-300 transition hover:text-red-200">
+                                            Eliminar
+                                        </button>
+                                    @endif
                                 </tr>
                             @endforeach
                         </tbody>
