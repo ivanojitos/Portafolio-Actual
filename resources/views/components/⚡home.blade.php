@@ -124,27 +124,27 @@ new class extends Component {
                         </div>
                     </div>
 
-                    @if ($profile->avatarMedia)
-                        <div class="relative mx-auto w-full max-w-sm lg:mx-0 lg:ml-auto">
-                            <div class="absolute -inset-4 -z-10 rounded-[2rem] bg-gradient-to-br from-cyan-300/20 to-indigo-500/20 blur-2xl"
-                                aria-hidden="true"></div>
 
-                            <img src="{{ $profile->avatarMedia->url() }}" alt="{{ $profile->avatarMedia->alt_text }}"
-                                width="332" height="443"
-                                class="aspect-[3/4] w-full rounded-[2rem] border border-cyan-300/20 object-cover object-top shadow-2xl shadow-black/40">
+                    <div class="relative mx-auto w-full max-w-sm lg:mx-0 lg:ml-auto">
+                        <div class="absolute -inset-4 -z-10 rounded-[2rem] bg-gradient-to-br from-cyan-300/20 to-indigo-500/20 blur-2xl"
+                            aria-hidden="true"></div>
 
-                            <div
-                                class="absolute -bottom-5 -left-5 rounded-2xl border border-white/10 bg-slate-900/90 px-5 py-4 shadow-xl backdrop-blur">
-                                <p class="font-mono text-xs uppercase tracking-widest text-slate-500">
-                                    Experiencia
-                                </p>
+                        <img src="{{ asset('images/ivan-alvarez-profile.jpg') }}"
+                            alt="Fotografía profesional de {{ $profile->full_name }}" width="332" height="443"
+                            class="aspect-[3/4] w-full rounded-[2rem] border border-cyan-300/20 object-cover object-top shadow-2xl shadow-black/40">
 
-                                <p class="mt-1 text-lg font-bold text-white">
-                                    7+ años
-                                </p>
-                            </div>
+                        <div
+                            class="absolute -bottom-5 -left-5 rounded-2xl border border-white/10 bg-slate-900/90 px-5 py-4 shadow-xl backdrop-blur">
+                            <p class="font-mono text-xs uppercase tracking-widest text-slate-500">
+                                Experiencia
+                            </p>
+
+                            <p class="mt-1 text-lg font-bold text-white">
+                                7+ años
+                            </p>
                         </div>
-                    @endif
+                    </div>
+
                 </div>
             </div>
         </section>
