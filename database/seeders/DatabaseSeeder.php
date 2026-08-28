@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
             ProjectSeeder::class,
             TagSeeder::class,
             ExperienceSeeder::class,
+            SkillSeeder::class,
         ]);
     }
 }
