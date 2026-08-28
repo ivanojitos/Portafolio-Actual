@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Project extends Model
 {
@@ -72,5 +74,21 @@ class Project extends Model
         return $this->is_published
             && $this->published_at !== null
             && $this->published_at->isPast();
+    }
+
+    public function media(): MorphMany
+    {
+        return $this->morphMany(
+            Media::class,
+            'mediable'
+        )->ordered();
+    }
+
+    public function primaryMedia(): MorphOne
+    {
+        return $this->morphOne(
+            Media::class,
+            'mediable'
+        )->where('is_primary', true);
     }
 }
