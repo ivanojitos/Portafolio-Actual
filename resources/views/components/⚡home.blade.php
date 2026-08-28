@@ -3,6 +3,7 @@
 use App\Models\Project;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
+use App\Models\Experience;
 
 new class extends Component {
     #[Computed]
@@ -15,6 +16,12 @@ new class extends Component {
             ->ordered()
             ->limit(6)
             ->get();
+    }
+
+    #[Computed]
+    public function experiences()
+    {
+        return Experience::query()->published()->ordered()->get();
     }
 };
 
@@ -31,6 +38,10 @@ new class extends Component {
             <div class="hidden items-center gap-8 text-sm text-slate-300 md:flex">
                 <a href="#inicio" class="transition hover:text-cyan-300">
                     Inicio
+                </a>
+
+                <a href="#experiencia" class="transition hover:text-cyan-300">
+                    Experiencia
                 </a>
 
                 <a href="#proyectos" class="transition hover:text-cyan-300">
@@ -79,6 +90,113 @@ new class extends Component {
                         </a>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <section id="experiencia" class="border-t border-white/10">
+            <div class="mx-auto max-w-7xl px-6 py-24 lg:px-8">
+                <div class="max-w-2xl">
+                    <p class="font-mono text-sm font-semibold uppercase tracking-[0.25em] text-cyan-300">
+                        Trayectoria profesional
+                    </p>
+
+                    <h2 class="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                        Experiencia
+                    </h2>
+
+                    <p class="mt-5 text-lg leading-8 text-slate-300">
+                        Experiencia desarrollando soluciones, mejorando sistemas
+                        y resolviendo problemas de negocio mediante software.
+                    </p>
+                </div>
+
+                @if ($this->experiences->isEmpty())
+                    <div class="mt-12 rounded-2xl border border-dashed border-white/20 p-10 text-center">
+                        <p class="text-slate-300">
+                            La experiencia profesional se publicará próximamente.
+                        </p>
+                    </div>
+                @else
+                    <div class="relative mt-14 space-y-8">
+                        <div class="absolute bottom-0 left-3 top-0 w-px bg-white/10 md:left-48" aria-hidden="true">
+                        </div>
+
+                        @foreach ($this->experiences as $experience)
+                            <article wire:key="experience-{{ $experience->id }}"
+                                class="relative grid gap-5 pl-10 md:grid-cols-[10rem_1fr] md:gap-12 md:pl-0">
+                                <div class="absolute left-[7px] top-2 h-3 w-3 rounded-full border-2 border-cyan-300 bg-slate-950 md:left-[185px]"
+                                    aria-hidden="true"></div>
+
+                                <div class="text-sm text-slate-400">
+                                    <time datetime="{{ $experience->started_at->format('Y-m') }}">
+                                        {{ ucfirst($experience->started_at->translatedFormat('M Y')) }}
+                                    </time>
+
+                                    <span aria-hidden="true"> — </span>
+
+                                    @if ($experience->is_current)
+                                        <span class="font-semibold text-cyan-300">
+                                            Actualidad
+                                        </span>
+                                    @elseif ($experience->ended_at)
+                                        <time datetime="{{ $experience->ended_at->format('Y-m') }}">
+                                            {{ ucfirst($experience->ended_at->translatedFormat('M Y')) }}
+                                        </time>
+                                    @endif
+                                </div>
+
+                                <div class="rounded-2xl border border-white/10 bg-slate-900/50 p-6">
+                                    <h3 class="text-xl font-bold text-white">
+                                        {{ $experience->job_title }}
+                                    </h3>
+
+                                    <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+                                        @if ($experience->company_url)
+                                            <a href="{{ $experience->company_url }}" target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="font-semibold text-cyan-300 transition hover:text-cyan-200">
+                                                {{ $experience->company }}
+                                            </a>
+                                        @else
+                                            <span class="font-semibold text-cyan-300">
+                                                {{ $experience->company }}
+                                            </span>
+                                        @endif
+
+                                        @if ($experience->location)
+                                            <span class="text-slate-500">
+                                                {{ $experience->location }}
+                                            </span>
+                                        @endif
+
+                                        @if ($experience->employment_type)
+                                            <span class="text-slate-500">
+                                                {{ $experience->employment_type }}
+                                            </span>
+                                        @endif
+                                    </div>
+
+                                    <p class="mt-5 leading-7 text-slate-300">
+                                        {{ $experience->summary }}
+                                    </p>
+
+                                    @if (!empty($experience->achievements))
+                                        <ul class="mt-5 space-y-3 text-sm leading-6 text-slate-400">
+                                            @foreach ($experience->achievements as $achievement)
+                                                <li class="flex gap-3">
+                                                    <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300"
+                                                        aria-hidden="true"></span>
+
+                                                    <span>{{ $achievement }}</span>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    @endif
+                                </div>
+                            </article>
+                        @endforeach
+                    </div>
+                @endif
             </div>
         </section>
 
