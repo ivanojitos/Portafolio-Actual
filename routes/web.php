@@ -27,3 +27,13 @@ Route::livewire(
         'admin',
     ])
     ->name('admin.dashboard');
+
+Route::livewire(
+    '/admin/proyectos',
+    'pages::admin.projects.index'
+)
+    ->middleware([
+        'auth',
+        'admin',
+    ])
+    ->name('admin.projects.index');
