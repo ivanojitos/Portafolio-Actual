@@ -10,11 +10,7 @@ use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-new
-#[Layout('layouts::app')]
-#[Title('Mensajes de contacto')]
-class extends Component
-{
+new #[Layout('layouts::app')] #[Title('Mensajes de contacto')] class extends Component {
     use WithPagination;
 
     #[Url(as: 'buscar', except: '')]
@@ -25,10 +21,7 @@ class extends Component
 
     public function mount(): void
     {
-        Gate::authorize(
-            'viewAny',
-            ContactMessage::class
-        );
+        Gate::authorize('viewAny', ContactMessage::class);
     }
 
     public function updatedSearch(): void
@@ -47,25 +40,13 @@ class extends Component
         return ContactMessage::query()
             ->when(
                 filled($this->search),
-                fn ($query) => $query->where(
-                    function ($query): void {
-                        $search = '%'.$this->search.'%';
+                fn($query) => $query->where(function ($query): void {
+                    $search = '%' . $this->search . '%';
 
-                        $query
-                            ->where('name', 'like', $search)
-                            ->orWhere('email', 'like', $search)
-                            ->orWhere('company', 'like', $search)
-                            ->orWhere('subject', 'like', $search);
-                    }
-                )
+                    $query->where('name', 'like', $search)->orWhere('email', 'like', $search)->orWhere('company', 'like', $search)->orWhere('subject', 'like', $search);
+                }),
             )
-            ->when(
-                filled($this->status),
-                fn ($query) => $query->where(
-                    'status',
-                    $this->status
-                )
-            )
+            ->when(filled($this->status), fn($query) => $query->where('status', $this->status))
             ->latest()
             ->paginate(15);
     }
@@ -103,13 +84,9 @@ class extends Component
                     Buscar mensajes
                 </label>
 
-                <input
-                    id="message-search"
-                    type="search"
-                    wire:model.live.debounce.300ms="search"
+                <input id="message-search" type="search" wire:model.live.debounce.300ms="search"
                     placeholder="Buscar por nombre, correo, empresa o asunto..."
-                    class="w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white outline-none placeholder:text-slate-600 focus:border-cyan-300"
-                >
+                    class="w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white outline-none placeholder:text-slate-600 focus:border-cyan-300">
             </div>
 
             <div>
@@ -117,11 +94,8 @@ class extends Component
                     Filtrar por estado
                 </label>
 
-                <select
-                    id="message-status"
-                    wire:model.live="status"
-                    class="w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white outline-none focus:border-cyan-300"
-                >
+                <select id="message-status" wire:model.live="status"
+                    class="w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white outline-none focus:border-cyan-300">
                     <option value="">Todos los estados</option>
 
                     @foreach ($this->statuses as $statusOption)
@@ -170,9 +144,13 @@ class extends Component
                                     </td>
 
                                     <td class="px-6 py-5">
-                                        <p class="max-w-md font-medium text-slate-200">
+                                        <a href="{{ route('admin.messages.show', [
+                                            'contactMessage' => $contactMessage,
+                                        ]) }}"
+                                            wire:navigate
+                                            class="block max-w-md font-medium text-slate-200 transition hover:text-cyan-300">
                                             {{ $contactMessage->subject }}
-                                        </p>
+                                        </a>
 
                                         <p class="mt-2 max-w-md truncate text-sm text-slate-500">
                                             {{ $contactMessage->message }}

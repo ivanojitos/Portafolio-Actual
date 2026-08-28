@@ -58,4 +58,11 @@ class ContactMessage extends Model
             'replied_at' => now(),
         ]);
     }
+
+    public function markAsSpam(): void
+    {
+        $this->update([
+            'status' => ContactMessageStatus::Spam,
+        ]);
+    }
 }

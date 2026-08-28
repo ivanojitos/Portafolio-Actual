@@ -67,3 +67,13 @@ Route::livewire(
         'admin',
     ])
     ->name('admin.messages.index');
+
+Route::livewire(
+    '/admin/mensajes/{contactMessage}',
+    'pages::admin.messages.show'
+)
+    ->middleware([
+        'auth',
+        'admin',
+    ])
+    ->name('admin.messages.show');
