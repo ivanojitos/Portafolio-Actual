@@ -66,4 +66,11 @@ class Project extends Model
             'taggable'
         );
     }
+
+    public function isPubliclyVisible(): bool
+    {
+        return $this->is_published
+            && $this->published_at !== null
+            && $this->published_at->isPast();
+    }
 }

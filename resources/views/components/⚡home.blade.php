@@ -122,7 +122,10 @@ new class extends Component {
                                 </div>
 
                                 <h3 class="mt-6 text-xl font-bold text-white">
-                                    {{ $project->title }}
+                                    <a href="{{ route('projects.show', $project) }}" wire:navigate
+                                        class="transition hover:text-cyan-300">
+                                        {{ $project->title }}
+                                    </a>
                                 </h3>
 
                                 <p class="mt-4 leading-7 text-slate-400">
