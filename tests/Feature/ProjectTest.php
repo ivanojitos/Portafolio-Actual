@@ -57,4 +57,59 @@ class ProjectTest extends TestCase
 
         $this->assertSame('Primer proyecto', $projects->first()->title);
     }
+
+    public function test_published_project_can_be_viewed(): void
+    {
+        $project = Project::factory()
+            ->published()
+            ->create([
+                'title' => 'Sistema público',
+                'slug' => 'sistema-publico',
+            ]);
+
+        $response = $this->get(
+            route('projects.show', [
+                'project' => $project->slug,
+            ])
+        );
+
+        $response
+            ->assertOk()
+            ->assertSee('Sistema público')
+            ->assertSee('Caso de estudio');
+    }
+
+    public function test_draft_project_cannot_be_viewed(): void
+    {
+        $project = Project::factory()->create([
+            'slug' => 'proyecto-borrador',
+            'is_published' => false,
+            'published_at' => null,
+        ]);
+
+        $response = $this->get(
+            route('projects.show', [
+                'project' => $project->slug,
+            ])
+        );
+
+        $response->assertNotFound();
+    }
+
+    public function test_scheduled_project_cannot_be_viewed_before_publication(): void
+    {
+        $project = Project::factory()->create([
+            'slug' => 'proyecto-programado',
+            'is_published' => true,
+            'published_at' => now()->addWeek(),
+        ]);
+
+        $response = $this->get(
+            route('projects.show', [
+                'project' => $project->slug,
+            ])
+        );
+
+        $response->assertNotFound();
+    }
 }
