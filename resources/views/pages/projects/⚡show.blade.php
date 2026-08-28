@@ -4,20 +4,14 @@ use App\Models\Project;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-new #[Layout('layouts::app')] class extends Component
-{
+new #[Layout('layouts::app')] class extends Component {
     public Project $project;
 
     public function mount(Project $project): void
     {
-        abort_unless(
-            $project->isPubliclyVisible(),
-            404
-        );
+        abort_unless($project->isPubliclyVisible(), 404);
 
-        $this->project = $project->load([
-            'tags:id,name,slug,color',
-        ]);
+        $this->project = $project->load(['tags:id,name,slug,color', 'primaryMedia:id,mediable_type,mediable_id,disk,path,alt_text']);
     }
 };
 
@@ -26,18 +20,11 @@ new #[Layout('layouts::app')] class extends Component
 <div>
     <header class="border-b border-white/10">
         <nav class="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
-            <a
-                href="{{ route('home') }}"
-                wire:navigate
-                class="font-bold text-white transition hover:text-cyan-300"
-            >
+            <a href="{{ route('home') }}" wire:navigate class="font-bold text-white transition hover:text-cyan-300">
                 Mi Portafolio
             </a>
 
-            <a
-                href="{{ route('home') }}#proyectos"
-                class="text-sm text-slate-300 transition hover:text-cyan-300"
-            >
+            <a href="{{ route('home') }}#proyectos" class="text-sm text-slate-300 transition hover:text-cyan-300">
                 ← Volver a proyectos
             </a>
         </nav>
@@ -61,16 +48,22 @@ new #[Layout('layouts::app')] class extends Component
                 @if ($project->tags->isNotEmpty())
                     <ul class="mt-8 flex flex-wrap gap-2">
                         @foreach ($project->tags as $tag)
-                            <li
-                                wire:key="tag-{{ $tag->id }}"
-                                class="rounded-full border border-cyan-300/20 bg-cyan-300/5 px-3 py-1 text-sm text-cyan-200"
-                            >
+                            <li wire:key="tag-{{ $tag->id }}"
+                                class="rounded-full border border-cyan-300/20 bg-cyan-300/5 px-3 py-1 text-sm text-cyan-200">
                                 {{ $tag->name }}
                             </li>
                         @endforeach
                     </ul>
                 @endif
             </div>
+
+            @if ($project->primaryMedia)
+                <figure class="mt-12">
+                    <img src="{{ $project->primaryMedia->url() }}"
+                        alt="{{ $project->primaryMedia->alt_text ?: 'Portada de ' . $project->title }}"
+                        class="aspect-video w-full rounded-2xl border border-white/10 object-cover shadow-2xl shadow-black/30">
+                </figure>
+            @endif
 
             <div class="mt-16 grid gap-8 lg:grid-cols-3">
                 <section class="rounded-2xl border border-white/10 bg-slate-900/50 p-7">
@@ -115,23 +108,15 @@ new #[Layout('layouts::app')] class extends Component
             @if ($project->repository_url || $project->demo_url)
                 <div class="mt-12 flex flex-wrap gap-4 border-t border-white/10 pt-10">
                     @if ($project->repository_url)
-                        <a
-                            href="{{ $project->repository_url }}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="rounded-xl bg-cyan-300 px-6 py-3 font-semibold text-slate-950 transition hover:bg-cyan-200"
-                        >
+                        <a href="{{ $project->repository_url }}" target="_blank" rel="noopener noreferrer"
+                            class="rounded-xl bg-cyan-300 px-6 py-3 font-semibold text-slate-950 transition hover:bg-cyan-200">
                             Ver repositorio
                         </a>
                     @endif
 
                     @if ($project->demo_url)
-                        <a
-                            href="{{ $project->demo_url }}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="rounded-xl border border-white/20 px-6 py-3 font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-300"
-                        >
+                        <a href="{{ $project->demo_url }}" target="_blank" rel="noopener noreferrer"
+                            class="rounded-xl border border-white/20 px-6 py-3 font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-300">
                             Abrir demostración
                         </a>
                     @endif

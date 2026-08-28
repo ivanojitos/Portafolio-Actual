@@ -13,7 +13,7 @@ new class extends Component {
     public function projects()
     {
         return Project::query()
-            ->with(['tags:id,name,slug,color'])
+            ->with(['tags:id,name,slug,color', 'primaryMedia:id,mediable_type,mediable_id,disk,path,alt_text'])
             ->published()
             ->featured()
             ->ordered()
@@ -410,6 +410,19 @@ new class extends Component {
                         @foreach ($this->projects as $project)
                             <article wire:key="project-{{ $project->id }}"
                                 class="group flex flex-col rounded-2xl border border-white/10 bg-slate-950/70 p-6 shadow-xl shadow-black/10 transition duration-300 hover:-translate-y-1 hover:border-cyan-300/50">
+                                @if ($project->primaryMedia)
+                                    <img src="{{ $project->primaryMedia->url() }}"
+                                        alt="{{ $project->primaryMedia->alt_text ?: 'Portada de ' . $project->title }}"
+                                        loading="lazy"
+                                        class="mb-6 aspect-video w-full rounded-xl border border-white/10 object-cover">
+                                @else
+                                    <div class="mb-6 flex aspect-video w-full items-center justify-center rounded-xl border border-white/10 bg-gradient-to-br from-cyan-300/10 to-indigo-400/10"
+                                        aria-hidden="true">
+                                        <span class="font-mono text-3xl font-black text-cyan-300/40">
+                                            {{ str_pad((string) $project->position, 2, '0', STR_PAD_LEFT) }}
+                                        </span>
+                                    </div>
+                                @endif
                                 <div class="flex items-center justify-between gap-4">
                                     <span
                                         class="rounded-full bg-cyan-300/10 px-3 py-1 text-xs font-semibold text-cyan-300">
