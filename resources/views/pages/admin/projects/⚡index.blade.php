@@ -192,36 +192,39 @@ new #[Layout('layouts::app')] #[Title('Administrar proyectos')] class extends Co
                                         {{ $project->position }}
                                     </td>
 
-                                    @if ($showTrashed)
-                                        <button type="button" wire:click="restore({{ $project->id }})"
-                                            class="text-sm font-semibold text-emerald-300 transition hover:text-emerald-200">
-                                            Restaurar
-                                        </button>
-                                    @else
-                                        <a href="{{ route('admin.projects.edit', [
-                                            'project' => $project->slug,
-                                        ]) }}"
-                                            wire:navigate
-                                            class="mr-4 text-sm font-semibold text-slate-300 transition hover:text-white">
-                                            Editar
-                                        </a>
+                                    <td class="px-6 py-5 text-right">
 
-                                        @if ($project->isPubliclyVisible())
-                                            <a href="{{ route('projects.show', [
+                                        @if ($showTrashed)
+                                            <button type="button" wire:click="restore({{ $project->id }})"
+                                                class="text-sm font-semibold text-emerald-300 transition hover:text-emerald-200">
+                                                Restaurar
+                                            </button>
+                                        @else
+                                            <a href="{{ route('admin.projects.edit', [
                                                 'project' => $project->slug,
                                             ]) }}"
-                                                target="_blank" rel="noopener noreferrer"
-                                                class="mr-4 text-sm font-semibold text-cyan-300 transition hover:text-cyan-200">
-                                                Ver ↗
+                                                wire:navigate
+                                                class="mr-4 text-sm font-semibold text-slate-300 transition hover:text-white">
+                                                Editar
                                             </a>
-                                        @endif
 
-                                        <button type="button" wire:click="delete({{ $project->id }})"
-                                            wire:confirm="¿Enviar este proyecto a la papelera?"
-                                            class="text-sm font-semibold text-red-300 transition hover:text-red-200">
-                                            Eliminar
-                                        </button>
-                                    @endif
+                                            @if ($project->isPubliclyVisible())
+                                                <a href="{{ route('projects.show', [
+                                                    'project' => $project->slug,
+                                                ]) }}"
+                                                    target="_blank" rel="noopener noreferrer"
+                                                    class="mr-4 text-sm font-semibold text-cyan-300 transition hover:text-cyan-200">
+                                                    Ver ↗
+                                                </a>
+                                            @endif
+
+                                            <button type="button" wire:click="delete({{ $project->id }})"
+                                                wire:confirm="¿Enviar este proyecto a la papelera?"
+                                                class="text-sm font-semibold text-red-300 transition hover:text-red-200">
+                                                Eliminar
+                                            </button>
+                                        @endif
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
